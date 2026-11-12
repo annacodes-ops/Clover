@@ -1,0 +1,17 @@
+{
+  "name": "CLOVER \u2014 Daily Grimoire",
+  "short_name": "CLOVER",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07110d",
+  "theme_color": "#07110d",
+  "description": "Five daily missions. Five leaves. Build your streak.",
+  "icons": [
+    {
+      "src": "clover-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

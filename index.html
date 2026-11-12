@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07110d">
+<meta name="description" content="Five daily missions. Five leaves. Build your streak.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>CLOVER — Daily Grimoire</title>
+<style>
+:root{color-scheme:dark;--bg:#07110d;--panel:#102017;--muted:#9bb2a2;--green:#43e58b;--lime:#c4ff79;--line:#294735}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:env(safe-area-inset-top) 15px env(safe-area-inset-bottom);background:radial-gradient(ellipse at 50% -20%,#1b4930 0%,#07110d 58%);color:#f1fff5;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+main{width:min(100%,520px);margin:0 auto;padding:20px 0 38px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.brand{font-size:12px;letter-spacing:.3em;color:var(--green);font-weight:850}
+.version{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:6px 9px;border-radius:30px;white-space:nowrap}
+h1{font-size:clamp(27px,8vw,36px);line-height:1.12;letter-spacing:-1.2px;margin:4px 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.5;margin:0 0 17px}
+.panel{background:linear-gradient(145deg,#13251b,#0c1711);border:1px solid var(--line);border-radius:21px;padding:16px;margin:13px 0;box-shadow:0 12px 38px #0004;min-width:0}
+.panel h2,.panel h3{margin:0 0 12px;font-size:17px}
+.clover-stage{height:clamp(190px,55vw,235px);display:grid;place-items:center;position:relative;overflow:hidden}
+.clover{width:min(190px,55vw);height:min(190px,55vw);max-width:100%;filter:drop-shadow(0 0 14px #38d77b22);transform-origin:center;z-index:1}
+.leaf{fill:#182c20;stroke:#477456;stroke-width:2.3;transition:fill .55s ease,filter .55s ease,stroke .55s ease}
+.leaf.done{fill:#35d879;stroke:#b6ffcb;filter:drop-shadow(0 0 11px #38e987)}
+.stem{fill:none;stroke:#477456;stroke-width:8;stroke-linecap:round}
+.clover.complete{animation:cloverSpin 1.15s cubic-bezier(.2,.8,.2,1) both}
+.clover.complete .leaf{filter:drop-shadow(0 0 15px #69ff9d)}
+@keyframes cloverSpin{0%{transform:scale(.8) rotate(0)}45%{transform:scale(1.13) rotate(190deg)}75%{transform:scale(1.06) rotate(330deg)}100%{transform:scale(1) rotate(360deg)}}
+.ring{position:absolute;width:min(205px,60vw);height:min(205px,60vw);border:1px solid #61f59a;border-radius:50%;opacity:0;pointer-events:none}
+.ring.burst{animation:ringBurst 1s ease-out}
+@keyframes ringBurst{0%{opacity:.8;transform:scale(.35)}100%{opacity:0;transform:scale(1.55)}}
+.progress{text-align:center;color:var(--muted);font-size:13px;line-height:1.5}.progress strong{color:var(--green)}
+.tasks{display:grid;gap:10px}
+.task{border:1px solid var(--line);background:#0a160f;border-radius:15px;padding:11px;display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:9px;align-items:center;min-width:0}
+.task.doneTask{border-color:#367d51;background:#10251a}
+.num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#1b3324;color:#b8d9c2;font-size:11px;font-weight:700}
+.taskname{width:100%;min-width:0;background:transparent;border:0;color:#f1fff5;font:inherit;font-size:14px;outline:none;padding:5px 0}
+.proof{font-size:11px;color:#9eb7a5;white-space:nowrap}
+.proof input{display:none}
+.proof label{border:1px solid #355b42;border-radius:9px;padding:7px 8px;display:block;cursor:pointer;max-width:115px;overflow:hidden;text-overflow:ellipsis}
+.task input[type=checkbox]{accent-color:#48e88d;width:18px;height:18px;margin:0}
+.task small{grid-column:2/4;color:#89a392;font-size:11px;line-height:1.35;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:#0a160f;border:1px solid var(--line);padding:12px;border-radius:15px;min-width:0}
+.stat b{font-size:25px;color:var(--lime);display:block;line-height:1.2}
+.stat span{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+button{background:#173a25;color:#caffd9;border:1px solid #39774e;border-radius:12px;padding:10px 13px;font:inherit;font-size:13px;font-weight:650;cursor:pointer;max-width:100%}
+button:active{transform:scale(.98)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.hint{font-size:11px;color:#8ba291;line-height:1.5;margin:12px 0 0}
+#setup,#reveal{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;padding:18px;background:#030906ed;overflow-y:auto}
+#setup.show,#reveal.show{display:flex}
+.setup-card{width:min(100%,440px);background:#102017;border:1px solid #39664a;border-radius:22px;padding:20px;box-shadow:0 20px 80px #000b;margin:auto}
+.setup-card h2{font-size:25px;line-height:1.15;margin:0 0 7px}
+.setup-card p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 15px}
+.setup-fields{display:grid;gap:9px}
+.setup-fields label{font-size:12px;color:#b9d2c1}
+.setup-fields input,.profile-input{width:100%;min-width:0;margin-top:5px;background:#08140d;color:white;border:1px solid #355b42;border-radius:10px;padding:11px;font:inherit}
+.setup-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+#reveal{z-index:20;background:radial-gradient(circle,#183b27 0%,#020604 72%);text-align:center}
+.devilstage{position:relative;width:min(340px,90vw);min-height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px}
+.devilsigil{font-size:clamp(75px,22vw,100px);line-height:1;filter:drop-shadow(0 0 22px #57ff92);animation:devilRise 1.1s cubic-bezier(.15,.8,.2,1) both}
+@keyframes devilRise{0%{opacity:0;transform:translateY(80px) scale(.3);filter:blur(12px)}65%{opacity:1;transform:translateY(-8px) scale(1.08);filter:blur(0)}100%{transform:translateY(0) scale(1)}}
+.devilstage h2{font-size:clamp(20px,6vw,26px);line-height:1.2;letter-spacing:.02em;margin:22px 0 8px;text-shadow:0 0 18px #5cff9c}
+.devilstage p{color:#b6d9c1;margin:0 0 24px;font-size:14px;line-height:1.5}
+.spark{position:absolute;width:5px;height:5px;background:#9affb8;border-radius:50%;box-shadow:0 0 12px #8affad;animation:float 2.8s ease-in-out infinite;pointer-events:none}
+@keyframes float{0%,100%{transform:translateY(25px) scale(.5);opacity:0}50%{transform:translateY(-60px) scale(1.2);opacity:1}}
+.profileline{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+@media(max-width:360px){body{padding-left:10px;padding-right:10px}.panel{padding:13px}.task{grid-template-columns:22px minmax(0,1fr) auto;gap:6px}.proof label{max-width:92px;padding:7px 6px}.taskname{font-size:13px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main>
+ <div class="top"><div class="brand">C L O V E R</div><div class="version">GRIMOIRE v0.5</div></div>
+ <h1>Your daily grimoire.</h1><p class="sub">Five missions. Five leaves. One day at a time.</p>
+ <section class="panel">
+  <div class="clover-stage"><div class="ring" id="ring"></div>
+   <svg class="clover" id="clover" viewBox="0 0 220 220" role="img" aria-label="Five-leaf clover">
+    <path class="stem" d="M110 112 Q112 158 145 193"/>
+    <path class="leaf" id="leaf0" d="M110 105 C72 92 57 55 80 35 C101 17 126 35 110 105Z"/>
+    <path class="leaf" id="leaf1" d="M115 105 C130 65 169 48 188 72 C207 96 181 119 115 105Z"/>
+    <path class="leaf" id="leaf2" d="M115 111 C156 119 177 157 153 177 C129 197 108 169 115 111Z"/>
+    <path class="leaf" id="leaf3" d="M105 113 C96 157 60 178 39 154 C18 130 43 106 105 113Z"/>
+    <path class="leaf" id="leaf4" d="M105 105 C66 77 68 35 98 25 C128 15 137 48 105 105Z"/>
+    <circle cx="110" cy="108" r="8" fill="#b4ff69"/>
+   </svg>
+  </div>
+  <div class="progress"><strong id="count">0 / 5</strong> leaves awakened</div>
+ </section>
+ <section class="panel"><h3>Today's missions</h3><div class="tasks" id="tasks"></div>
+  <div class="actions"><button id="editTasks">Edit my five missions</button><button id="reset">Reset today</button></div>
+  <p class="hint">Upload a photo for a mission before checking it off. Your progress and photos are stored on this device/browser in this prototype.</p>
+ </section>
+ <section class="panel"><h3>Grimoire stats</h3><div class="stats"><div class="stat"><b id="streak">0</b><span>Current streak</span></div><div class="stat"><b id="best">0</b><span>Best streak</span></div></div></section>
+ <section class="panel"><div class="profileline"><span>Local profile: <b id="profileName">Guest</b></span><button id="editProfile">Change profile name</button></div><p class="hint">This is a device-only profile, not an online account. It does not use or store a password.</p></section>
+</main>
+<div id="setup" class="show" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+ <div class="setup-card">
+  <h2 id="setupTitle">Create your grimoire 🍀</h2>
+  <p>Choose the five missions you want to track. You can edit them any time.</p>
+  <div class="setup-fields" id="setupFields"></div>
+  <div class="setup-actions"><button id="saveSetup">Save my five missions</button></div>
+ </div>
+</div>
+<div id="reveal" role="dialog" aria-modal="true">
+ <div class="devilstage" id="devilstage"><div class="devilsigil">♟</div><h2>THE FIFTH LEAF</h2><p>...dwells a devil.</p><button id="closeReveal">Return to grimoire</button></div>
+</div>
+<script>
+const defaults=['Study / learning','Workout / movement','Build a skill','Read / reflect','Complete one personal task'];
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+let data={};
+try{data=JSON.parse(localStorage.getItem('cloverDataV05')||'{}')}catch(e){data={}}
+data.tasks=Array.isArray(data.tasks)&&data.tasks.length===5?data.tasks:defaults.slice();
+data.days=data.days||{};data.best=Number(data.best||0);data.streak=Number(data.streak||0);data.last=data.last||'';data.profile=data.profile||'Guest';data.setupDone=!!data.setupDone;
+const day=today();if(!data.days[day])data.days[day]=[];
+let proofBlobs={};let proofFlags={};let celebrated=false;
+function save(){localStorage.setItem('cloverDataV05',JSON.stringify(data))}
+function makeSetup(){
+ const fields=document.getElementById('setupFields');fields.innerHTML='';
+ for(let i=0;i<5;i++){const lab=document.createElement('label');lab.textContent=`Mission ${i+1}`;const input=document.createElement('input');input.maxLength=48;input.value=data.tasks[i]||'';input.placeholder=`Enter mission ${i+1}`;input.id=`setupTask${i}`;lab.appendChild(input);fields.appendChild(lab)}
+}
+function openSetup(){makeSetup();document.getElementById('setup').classList.add('show')}
+function closeSetup(){document.getElementById('setup').classList.remove('show')}
+document.getElementById('saveSetup').onclick=()=>{const vals=[];for(let i=0;i<5;i++){const v=document.getElementById(`setupTask${i}`).value.trim();if(!v){alert(`Please enter Mission ${i+1}.`);return}vals.push(v)}data.tasks=vals;data.setupDone=true;save();closeSetup();render()};
+function render(){
+ const wrap=document.getElementById('tasks');wrap.innerHTML='';
+ for(let i=0;i<5;i++){
+  const done=(data.days[day]||[]).includes(i), proof=!!proofFlags[i];
+  const el=document.createElement('div');el.className='task'+(done?' doneTask':'');
+  const num=document.createElement('div');num.className='num';num.textContent=i+1;
+  const name=document.createElement('input');name.className='taskname';name.type='text';name.maxLength=48;name.value=data.tasks[i];name.setAttribute('aria-label',`Mission ${i+1}`);name.addEventListener('change',()=>{data.tasks[i]=name.value.trim()||defaults[i];save();name.value=data.tasks[i]});
+  const proofWrap=document.createElement('div');proofWrap.className='proof';const file=document.createElement('input');file.type='file';file.accept='image/*';file.id=`file${i}`;const label=document.createElement('label');label.htmlFor=file.id;label.textContent=proof?'✓ Proof added':'＋ Photo proof';file.addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f){if(f.size>8*1024*1024){alert('Please choose an image under 8 MB.');return}proofFlags[i]=true;proofBlobs[i]=f;render()}});proofWrap.append(file,label);
+  const check=document.createElement('input');check.type='checkbox';check.checked=done;check.disabled=!proof&&!done;check.setAttribute('aria-label',`Mark mission ${i+1} complete`);check.addEventListener('change',()=>{let a=data.days[day]||[];if(check.checked&&!a.includes(i))a.push(i);if(!check.checked)a=a.filter(x=>x!==i);data.days[day]=a;save();render();if(a.length===5)celebrate()});
+  const small=document.createElement('small');small.textContent=done?'Mission completed':proof?'Proof selected — tick the box to complete':'Add a photo to unlock completion';
+  el.append(num,name,proofWrap,check,small);wrap.appendChild(el);
+ }
+ document.getElementById('profileName').textContent=data.profile;update();
+}
+function update(){
+ const completed=data.days[day]||[];document.getElementById('count').textContent=`${completed.length} / 5`;
+ for(let i=0;i<5;i++)document.getElementById('leaf'+i).classList.toggle('done',completed.includes(i));
+ const y=new Date();y.setDate(y.getDate()-1);const yesterday=`${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+ let current=data.streak;if(data.last!==day&&data.last!==yesterday)current=0;
+ document.getElementById('streak').textContent=current;document.getElementById('best').textContent=data.best;
+}
+function celebrate(){
+ if(celebrated)return;celebrated=true;
+ if(data.last!==day){const y=new Date();y.setDate(y.getDate()-1);const yesterday=`${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;data.streak=data.last===yesterday?data.streak+1:1;data.last=day;data.best=Math.max(data.best,data.streak);save();update()}
+ const c=document.getElementById('clover');c.classList.remove('complete');void c.offsetWidth;c.classList.add('complete');const ring=document.getElementById('ring');ring.classList.remove('burst');void ring.offsetWidth;ring.classList.add('burst');
+ setTimeout(()=>{document.getElementById('reveal').classList.add('show');const stage=document.getElementById('devilstage');stage.querySelectorAll('.spark').forEach(x=>x.remove());for(let i=0;i<18;i++){const s=document.createElement('i');s.className='spark';s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*75)+'%';s.style.animationDelay=(Math.random()*2)+'s';stage.appendChild(s)}},950);
+}
+document.getElementById('closeReveal').onclick=()=>document.getElementById('reveal').classList.remove('show');
+document.getElementById('editTasks').onclick=openSetup;
+document.getElementById('reset').onclick=()=>{if(confirm("Reset today's five missions?")){data.days[day]=[];proofFlags={};proofBlobs={};celebrated=false;save();render()}};
+document.getElementById('editProfile').onclick=()=>{const name=prompt('Choose a profile name (no password or personal details needed):',data.profile);if(name!==null&&name.trim()){data.profile=name.trim().slice(0,24);save();render()}};
+if(!data.setupDone)openSetup();else closeSetup();
+if((data.days[day]||[]).length===5){celebrated=true}
+render();save();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
